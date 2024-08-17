@@ -1,0 +1,63 @@
+CREATE TABLE FACULTY(
+	faculty_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	abbreviation VARCHAR(20) NOT NULL
+)AUTO_INCREMENT=1;
+
+CREATE TABLE DEGREE_PROGRAM(
+	degree_program_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	abbreviation VARCHAR(20) NOT NULL,
+	ects_points SMALLINT NOT NULL,
+	campus TINYINT NOT NULL,
+	number_of_semester TINYINT NOT NULL,
+	faculty_id INTEGER NOT NULL NOT NULL,
+	FOREIGN KEY (faculty_id) REFERENCES FACULTY(faculty_id)
+)AUTO_INCREMENT=1;
+
+CREATE TABLE LECTURER(
+	lecturer_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	first_name VARCHAR(255) NOT NULL,
+	last_name VARCHAR(255) NOT NULL,
+	personnel_number INTEGER NOT NULL,
+	email VARCHAR(255) NOT NULL,
+	room VARCHAR(10) NOT NULL,
+	is_dean BOOLEAN NOT NULL,
+	degree_program_id INTEGER NOT NULL,
+	FOREIGN KEY(degree_program_id) REFERENCES DEGREE_PROGRAM(degree_program_id)
+) AUTO_INCREMENT =1;
+
+CREATE TABLE COURSE(
+	course_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	course_name VARCHAR(255) NOT NULL,
+	semester_hours FLOAT NOT NULL,
+	course_type TINYINT NOT NULL,
+	lecturer_id INTEGER NOT NULL,
+	FOREIGN KEY(lecturer_id) REFERENCES LECTURER(lecturer_id)
+) AUTO_INCREMENT=1;
+
+CREATE TABLE STUDENT(
+    student_id binary(16) PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    birth_date DATE NOT NULL,
+    student_number INTEGER NOT NULL AUTO_INCREMENT UNIQUE,
+    ects_points SMALLINT NOT NULL,
+    malus_points SMALLINT NOT NULL,
+    semester_fees_paid BOOLEAN NOT NULL,
+    semester TINYINT NOT NULL,
+    degree_program_id INTEGER NOT NULL,
+    FOREIGN KEY(degree_program_id) REFERENCES DEGREE_PROGRAM(degree_program_id)
+) AUTO_INCREMENT=100000;
+
+CREATE TABLE EXAM(
+    exam_id BINARY(16) PRIMARY KEY,
+	attempt TINYINT,
+	status TINYINT,
+	grade FLOAT,
+	annotation TINYINT,
+	student_id BINARY(16) NOT NULL,
+    course_id INTEGER NOT NULL,
+	FOREIGN KEY (student_id) REFERENCES STUDENT(student_id),
+	FOREIGN KEY (course_id) REFERENCES COURSE(course_id)
+);
