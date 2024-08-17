@@ -8,9 +8,6 @@ import com.tolunayoezcan.spring_boot_optimization.model.Student;
 import com.tolunayoezcan.spring_boot_optimization.repository.ExamRepository;
 import com.tolunayoezcan.spring_boot_optimization.repository.StudentRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,18 +24,15 @@ public class ExamService {
     private StudentRepository studentRepository;
     private ExamMapper examMapper;
 
-    @Cacheable(value = "allExams")
     public List<ExamDTO> getAllExams() {
         return examMapper.modelsToDto(examRepository.findAll());
     }
 
-    @Cacheable(value = "exams", key = "#examId")
     public ExamDTO getExamById(UUID examId) {
         return examMapper.modelToDto(examRepository.findById(examId).orElseThrow());
     }
 
 
-    @Cacheable(value = "examsByStudent", key = "#studentId")
     public List<ExamDTO> getAllExamsByStudentId(UUID studentId) {
 
         Optional<Student> student = studentRepository.findById(studentId);
@@ -47,7 +41,6 @@ public class ExamService {
     }
 
     @Transactional
-    @CachePut(value = "exams", key = "#exam.examId")
     public ExamDTO createNewExam(ExamDTO examDTO) {
         Exam exam = examMapper.dtoToModel(examDTO);
         exam.setStatus(StatusEnum.AN);
@@ -63,7 +56,6 @@ public class ExamService {
     }
 
     @Transactional
-    @CachePut(value = "exams", key = "#exam.examId")
     public ExamDTO updateExam(UUID examId, Exam examToUpdate) {
         Student student = studentRepository.findById(examToUpdate.getStudent().getStudentId()).orElseThrow();
         examToUpdate.setExamId(examId);
@@ -71,7 +63,6 @@ public class ExamService {
         return examMapper.modelToDto(examRepository.save(examToUpdate));
     }
 
-    @CacheEvict(value = "exams", key = "#examId")
     public void deleteExam(UUID examId) {
         if (examRepository.existsById(examId)) {
             examRepository.deleteById(examId);
