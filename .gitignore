@@ -25,6 +25,5 @@ replay_pid*
 
 .classpath
 .project
-.settings/w
+.settings/
 target/
-.idea
