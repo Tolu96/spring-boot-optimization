@@ -1,0 +1,13 @@
+name: spring_boot_optimization
+
+services:
+  spring_boot_optimization:
+    image: mysql:9.0.1
+    command: --lower_case_table_names=0
+    restart: always
+    ports:
+      - 2301:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: spring_boot_optimization
+      TZ: Europe/Berlin
