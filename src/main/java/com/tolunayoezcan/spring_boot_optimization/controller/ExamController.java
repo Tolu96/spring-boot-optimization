@@ -4,6 +4,8 @@ import com.tolunayoezcan.spring_boot_optimization.dto.ExamDTO;
 import com.tolunayoezcan.spring_boot_optimization.model.Exam;
 import com.tolunayoezcan.spring_boot_optimization.service.ExamService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,8 +21,9 @@ public class ExamController {
     private ExamService examService;
 
     @GetMapping
-    private ResponseEntity<List<ExamDTO>> getAllExams() {
-        return ResponseEntity.ok().body(examService.getAllExams());
+    public ResponseEntity<Page<ExamDTO>> getAllExams(Pageable pageable) {
+        Page<ExamDTO> exams = examService.getAllExams(pageable);
+        return ResponseEntity.ok(exams);
     }
 
     @GetMapping("{examId}")

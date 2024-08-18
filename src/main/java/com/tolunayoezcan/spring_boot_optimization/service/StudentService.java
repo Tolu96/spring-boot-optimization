@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,15 +25,16 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final StudentMapper studentMapper;
 
-    @Cacheable(value = "students")
-    public List<StudentDTO> getAllStudents() {
-        return studentMapper.modelsToDto(studentRepository.findAll());
+    @Cacheable(value = "allStudents", key = "#pageable.pageNumber + '-' + #pageable.pageSize + '-' + #pageable.sort")
+    public Page<StudentDTO> getAllStudents(Pageable pageable) {
+        return studentRepository.findAll(pageable).map(studentMapper::modelToDto);
     }
 
     @Cacheable(value = "studentById", key = "#studentId")
     public StudentDTO getStudentById(UUID studentId) {
         return studentMapper.modelToDto(studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with this Id was not " +
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with this Id was " +
+                        "not " +
                         "found")));
     }
 
@@ -66,13 +69,16 @@ public class StudentService {
     public StudentDTO updateStudent(UUID studentId, Student studentToUpdate) {
         studentToUpdate.setStudentId(studentId);
         studentToUpdate.setDegreeProgram(studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with this Id was not " +
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student with this Id was " +
+                        "not " +
                         "found"))
                 .getDegreeProgram());
         return studentMapper.modelToDto(studentRepository.save(studentToUpdate));
     }
 
-    @CacheEvict(value = {"studentById", "students", "studentsBySemesterAndDegreeProgram", "studentsByDegreeProgram"},
+    @CacheEvict(value = {
+            "studentById", "students", "studentsBySemesterAndDegreeProgram",
+            "studentsByDegreeProgram"},
             key = "#studentId", allEntries = true)
     public void deleteStudent(UUID studentId) {
         if (studentRepository.existsById(studentId)) {

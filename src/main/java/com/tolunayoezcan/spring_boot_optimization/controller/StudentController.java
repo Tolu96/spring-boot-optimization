@@ -5,6 +5,8 @@ import com.tolunayoezcan.spring_boot_optimization.model.DegreeProgram;
 import com.tolunayoezcan.spring_boot_optimization.model.Student;
 import com.tolunayoezcan.spring_boot_optimization.service.StudentService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,8 +22,10 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping
-    private ResponseEntity<List<StudentDTO>> getAllStudents() {
-        return ResponseEntity.ok().body(studentService.getAllStudents());
+    private ResponseEntity<Page<StudentDTO>> getAllStudents(Pageable pageable) {
+        Page<StudentDTO> students = studentService.getAllStudents(pageable);
+
+        return ResponseEntity.ok().body(students);
     }
 
     @GetMapping("{studentId}")
