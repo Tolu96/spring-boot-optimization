@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @EnableCaching
-@EnableAsync
 public class SpringBootOptimizationApplication {
 
     public static void main(String[] args) {
